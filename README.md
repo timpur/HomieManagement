@@ -60,3 +60,11 @@ run `dotnet ef migrations add {verion eg. v1}`
 
 ### Update
 run `dotnet ef database upgrade`
+
+## Usage
+
+Copy the AppConfig.default.json file as AppConfig.json and input your settings.
+
+## Licence
+
+This is yet to be worked out...
