@@ -13,6 +13,11 @@ Built in Visual Studio 2017 using Angular 4 and DotNet Core 2.0
   * SignalR Core (Coms -> Websockets)
   * M2M MQTT Core Client
 
+![alt text](https://raw.githubusercontent.com/timpur/HomieManagement/master/Doc/Devices.jpg "Devices")
+
+![alt text](https://raw.githubusercontent.com/timpur/HomieManagement/master/Doc/FirmwareManager.jpg "Devices")
+
+
 ##### --- No Suport for this project yet.
 
 ##### Note below is some basic instructions but im not yet ready to commit much time to supporting issues. So if you want to start using/developing this project it will be out of your time, sorry.
