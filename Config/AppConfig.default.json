@@ -1,0 +1,12 @@
+{
+  "AppConfig": {
+    "MqttHostName": "mqtt.server.com",
+    "Port": 1883,
+    "UserName": "username",
+    "Password": "password",
+    "RootDeviceTopicLevels": [
+      "homie/",
+      "test/"
+    ]
+  }
+}

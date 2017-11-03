@@ -1,0 +1,7 @@
+<h2 mat-dialog-title>Device Details - {{Device.Name}}</h2>
+<mat-dialog-content>
+  <div *ngFor="let Node of Device.Nodes">
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">Name:</span><span class="mat-body-1" fxFlex>{{Node.NodeID}}</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">Type:</span><span class="mat-body-1" fxFlex>{{Node.Type}}</span></p>
+  </div>
+</mat-dialog-content>

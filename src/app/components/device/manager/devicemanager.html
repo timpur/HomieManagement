@@ -1,0 +1,4 @@
+<div class="container" fxLayout="column" fxLayoutAlign="start center" fxLayout.gt-sm="row" fxLayoutAlign.gt-sm="space-around start" fxLayoutWrap.gt-sm>
+  <device *ngFor="let Device of deviceObserver | async" [Device]="Device" class="small-device" fxFlex="100" fxFlex.gt-sm="50" fxFlex.gt-mat="33.3" fxFlex.gt-lg="25">
+  </device>
+</div>

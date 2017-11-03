@@ -1,0 +1,11 @@
+﻿{
+  "/api": {
+    "target": "http://localhost:5000",
+    "secure": false
+  },
+  "/signalr": {
+    "target": "http://localhost:5000",
+    "secure": false,
+    "ws": true
+  }
+}

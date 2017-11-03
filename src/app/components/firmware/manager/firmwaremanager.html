@@ -1,0 +1,43 @@
+<div class="space top" fxLayout="row" fxLayoutAlign="center center">
+  <div fxFlex="100%" fxFlex.gt-sm="50%">
+    <button mat-raised-button (click)="showAddFirmwareDialog()" class="space bottom">Add</button>
+    <button mat-raised-button (click)="showUpdateDeviceDialog()" class="space bottom">Update Device</button>
+    <mat-table #table [dataSource]="dataSource" class="mat-elevation-z8">
+
+      <ng-container matColumnDef="ID">
+        <mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
+        <mat-cell *matCellDef="let row">{{row.ID}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="Name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
+        <mat-cell *matCellDef="let row">{{row.Name}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="Version">
+        <mat-header-cell *matHeaderCellDef> Version </mat-header-cell>
+        <mat-cell *matCellDef="let row">{{row.Version}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="Description">
+        <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+        <mat-cell *matCellDef="let row">{{row.Description}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="DateCreated">
+        <mat-header-cell *matHeaderCellDef> Date Created </mat-header-cell>
+        <mat-cell *matCellDef="let row">{{row.DateCreated | date}}</mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="Menu">
+        <mat-header-cell *matHeaderCellDef></mat-header-cell>
+        <mat-cell *matCellDef="let row" fxLayout="row" fxLayoutAlign="end start">
+          <button mat-icon-button color="warn" (click)="remove(row)" matTooltip="Remove"><mat-icon>close</mat-icon></button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="columns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: columns;" class="row"></mat-row>
+    </mat-table>
+  </div>
+</div>

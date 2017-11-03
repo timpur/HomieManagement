@@ -1,0 +1,85 @@
+<h2 mat-dialog-title>Device Config - {{Device.Config.Name}}</h2>
+<mat-dialog-content>
+  <div class="space top bottom">
+    <div>
+      <p class="mat-body-2">Device Name</p>
+      <mat-form-field>
+        <input matInput placeholder="Name" [(ngModel)]="Device.Config.Name" required>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="ID" [(ngModel)]="Device.Config.DeviceID" required>
+      </mat-form-field>
+    </div>
+    <div>
+      <p class="mat-body-2">Device WiFi</p>
+      <mat-form-field>
+        <input matInput placeholder="SSID" [(ngModel)]="Device.Config.WiFi.SSID" required>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Password" [(ngModel)]="Device.Config.WiFi.Password">
+      </mat-form-field>
+    </div>
+    <div>
+      <p class="mat-body-2">Device MQTT</p>
+      <mat-form-field>
+        <input matInput placeholder="Host" [(ngModel)]="Device.Config.MQTT.Host" required>
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Port" [(ngModel)]="Device.Config.MQTT.Port" required>
+      </mat-form-field>
+      <br />
+      <mat-form-field>
+        <input matInput placeholder="Base Topic" [(ngModel)]="Device.Config.MQTT.BaseTopic">
+      </mat-form-field>
+      <mat-checkbox [(ngModel)]="Device.Config.MQTT.Auth">Auth</mat-checkbox>
+      <div *ngIf="Device.Config.MQTT.Auth">
+        <mat-form-field>
+          <input matInput placeholder="Username" [(ngModel)]="Device.Config.MQTT.Username">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Password" [(ngModel)]="Device.Config.MQTT.Password">
+        </mat-form-field>
+      </div>
+    </div>
+    <div>
+      <p class="mat-body-2">Device OTA</p>
+      <mat-checkbox [(ngModel)]="Device.Config.OTA.Enabled">OTA Enabled</mat-checkbox>
+    </div>
+    <div>
+      <p class="mat-body-2">Device Settings</p>
+      <div>
+        <div *ngFor="let setting of Device.Config.getSettingsKeys()">
+          <span [ngSwitch]="type(Device.Config.Settings[setting])">
+            <mat-form-field *ngSwitchCase="'string'">
+              <input matInput placeholder="{{setting}}" [(ngModel)]="Device.Config.Settings[setting]" type="text">
+            </mat-form-field>
+            <mat-form-field *ngSwitchCase="'number'">
+              <input matInput placeholder="{{setting}}" [(ngModel)]="Device.Config.Settings[setting]" type="number">
+            </mat-form-field>
+            <mat-checkbox *ngSwitchCase="'boolean'" [(ngModel)]="Device.Config.Settings[setting]">{{setting}}</mat-checkbox>
+          </span>
+          <button mat-icon-button class="space left" color="warn" (click)="Remove(setting)" matTooltip="Remove"><mat-icon>remove_circle</mat-icon></button>
+        </div>
+      </div>
+      <div>
+        <p class="mat-body-2">Add Setting</p>
+        <mat-form-field>
+          <input matInput placeholder="Setting Name" [(ngModel)]="AddSetting.Name">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select placeholder="Type" [(ngModel)]="AddSetting.Type">
+            <mat-option *ngFor="let Type of Types" [value]="Type">
+              {{Type}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-raised-button class="space left" color="primary" (click)="Add()">Add Setting</button>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions fxLayout fxLayoutAlign="space-around start">
+  <button mat-raised-button color="primary" [mat-dialog-close]="0">Cancel</button>
+  <button mat-raised-button color="accent" [mat-dialog-close]="1">Save</button>
+  <button mat-raised-button color="warn" [mat-dialog-close]="2">Reset</button>
+</mat-dialog-actions>

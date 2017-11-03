@@ -1,0 +1,64 @@
+<h2 mat-dialog-title fxLayout>
+  <span fxFlex>Update Device</span>
+  <button mat-icon-button mat-dialog-close="false" matTooltip="Close"><mat-icon>close</mat-icon></button>
+</h2>
+<mat-dialog-content>
+  <mat-horizontal-stepper linear>
+    <mat-step [stepControl]="part1Form" editable="false">
+      <form #part1Form="ngForm">
+        <ng-template matStepLabel>Select Device and Firmware</ng-template>
+        <mat-form-field style="width:300px">
+          <mat-select #deviceSelect name="deviceSelect" placeholder="Device" [(ngModel)]="device" required>
+            <mat-option *ngFor="let device of devices" [value]="device" [matTooltip]="device.Config.DeviceID" matTooltipPosition="above">{{device.Name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <br />
+        <mat-form-field style="width:300px">
+          <mat-select #firmwareName name="firmwareName" placeholder="Firmware" [(ngModel)]="selectedFirmwareChain" required>
+            <mat-option *ngFor="let firmware of firmwares" [value]="firmware">{{firmware.Name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field style="width:300px">
+          <mat-select #firmwareVersion name="firmwareVersion" placeholder="Version" [(ngModel)]="firmware" required>
+            <mat-option *ngFor="let firmware of firmwareChain" [value]="firmware">{{firmware.Version}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div>
+          <button mat-raised-button color="accent" matStepperNext [disabled]="!part1Form.valid">Next</button>
+        </div>
+      </form>
+    </mat-step>
+    <mat-step [stepControl]="part2Form" editable="false">
+      <form #part2Form="ngForm">
+        <ng-template matStepLabel>Device Update Status</ng-template>
+        <div [ngSwitch]="updateStage">
+          <div *ngSwitchCase="0">
+            <h2>Update Not Started</h2>
+            <button mat-raised-button color="primary" matStepperPrevious>Back</button>
+            <button mat-raised-button color="accent" (click)="startUpdate()">Start Updating</button>
+          </div>
+          <div *ngSwitchCase="1">
+            <h2>Update Started</h2>
+            <p>Waiting for response</p>
+            <br />
+            <mat-spinner></mat-spinner>
+          </div>
+          <div *ngSwitchCase="2">
+            <h2>Updating</h2>
+            <p>Message: {{displayMSG}}</p>
+            <p>Progress: {{wrBytes}}/{{totalBytes}} Bytes</p>
+            <mat-progress-bar mode="determinate" [value]="getProgressValue()"></mat-progress-bar>
+          </div>
+          <div *ngSwitchCase="3">
+            <h2>Finished Updating</h2>
+            <button mat-raised-button color="accent" mat-dialog-close="true">Close</button>
+          </div>
+          <div *ngSwitchCase="-1">
+            <h2>Update Error</h2>
+            <p>Message: {{displayMSG}}</p>
+          </div>
+        </div>
+      </form>
+    </mat-step>
+  </mat-horizontal-stepper>
+</mat-dialog-content>

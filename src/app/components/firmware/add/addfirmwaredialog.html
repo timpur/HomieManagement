@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>Add Frimware</h2>
+<mat-dialog-content>
+  <div style="width:300px;">
+    <input #file type="file" accept=".bin" />
+  </div>
+  <br />
+  <mat-form-field style="width:300px;">
+    <input matInput placeholder="Description" [(ngModel)]="description">
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button color="primary" mat-dialog-close="false">Cancel</button>
+  <button mat-raised-button color="accent" mat-dialog-close="true">Add</button>
+</mat-dialog-actions>

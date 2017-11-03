@@ -1,0 +1,18 @@
+<mat-card>
+  <h1 class="mat-headline">
+    <span matTooltip="Device Name">{{Device.Name}}</span>
+    <br />
+    <span class="mat-subheading-2" matTooltip="Device ID">{{Device.Config.DeviceID}}</span>
+  </h1>
+  <mat-chip-list class="center-items">
+    <mat-chip color="accent" [selected]="Device.Status" matTooltip="Device Status"><mat-icon>{{Device.Status? "wifi":"signal_wifi_off"}}</mat-icon></mat-chip>
+    <mat-chip color="primary" [selected]="Device.Status" matTooltip="Wifi Signal"><mat-icon>network_cell</mat-icon><span class="space left-8">{{Device.Signal + "%"}}</span></mat-chip>
+    <mat-chip matTooltip="Local IP Address">{{Device.LocalIP}}</mat-chip>
+    <mat-chip matTooltip="Firmware Version">{{Device.FWVersion}}</mat-chip>
+  </mat-chip-list>
+  <div class="space top">
+    <button mat-raised-button (click)="viewDeviceDetails()"><mat-icon>add</mat-icon> Details</button>
+    <button mat-raised-button (click)="viewDeviceNodes()"><mat-icon>settings</mat-icon> Nodes</button>
+    <button mat-raised-button (click)="viewDeviceConfig()"><mat-icon>settings</mat-icon> Config</button>
+  </div>
+</mat-card>

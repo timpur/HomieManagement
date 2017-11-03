@@ -1,0 +1,12 @@
+.active {
+  background-color: #d0d0d0
+}
+
+mat-sidenav {
+  width: 300px;
+}
+
+main {
+  width: 100%;
+  height: calc(100% - 64px);
+}

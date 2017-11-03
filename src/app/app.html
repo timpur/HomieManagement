@@ -1,0 +1,21 @@
+<mat-sidenav-container class="full">
+  <mat-sidenav #sidenav>
+    <mat-toolbar color="accent">
+      <span>Navigation</span>
+    </mat-toolbar>
+    <mat-list>
+      <mat-list-item routerLink="/devices" routerLinkActive="active" (click)="sidenav.close()">Devices</mat-list-item>
+      <mat-list-item routerLink="/firmware" routerLinkActive="active" (click)="sidenav.close()">Firmware</mat-list-item>
+    </mat-list>
+  </mat-sidenav>
+
+  <div class="full">
+    <mat-toolbar color="primary">
+      <button mat-button (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
+      <span>{{title}}</span>
+    </mat-toolbar>
+    <main>
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</mat-sidenav-container>

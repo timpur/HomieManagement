@@ -1,0 +1,4 @@
+﻿.row * {
+  word-break:break-word;
+  text-overflow:ellipsis;
+}

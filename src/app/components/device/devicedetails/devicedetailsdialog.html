@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>Device Details - {{Device.Name}}</h2>
+<mat-dialog-content>
+  <div class="details">
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">Name:</span><span class="mat-body-1" fxFlex>{{Device.Name}}</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">ID:</span><span class="mat-body-1" fxFlex>{{Device.Config.DeviceID}}</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">MQTT Root Topic:</span><span class="mat-body-1" fxFlex>{{Device.MQTTRootTopicLevel}}</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">Status:</span><span class="mat-body-1" fxFlex>{{Device.Status}}</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">Signal:</span><span class="mat-body-1" fxFlex>{{Device.Signal}}%</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">Local IP:</span><span class="mat-body-1" fxFlex>{{Device.LocalIP}}</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">MAC:</span><span class="mat-body-1" fxFlex>{{Device.MAC}}</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">UpTime:</span><span class="mat-body-1" fxFlex>{{Device.getUpTime()}}</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">Type:</span><span class="mat-body-1" fxFlex>{{Device.Implementation}}</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">Homie Version:</span><span class="mat-body-1" fxFlex>{{Device.ImplementationVersion}}</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">FW Name:</span><span class="mat-body-1" fxFlex>{{Device.FWName}}</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">FW Version:</span><span class="mat-body-1" fxFlex>{{Device.FWVersion}}</span></p>
+    <p fxLayout><span class="mat-body-2" fxFlex="150px">OTA:</span><span class="mat-body-1" fxFlex>{{Device.OTAEnabled}}</span></p>
+
+  </div>
+</mat-dialog-content>

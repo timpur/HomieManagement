@@ -1,0 +1,11 @@
+:host {
+  padding: 10px;
+}
+
+mat-chip {
+  margin: auto !important;
+}
+
+.float-right{
+  float:right;
+}
