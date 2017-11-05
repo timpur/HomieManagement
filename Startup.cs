@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -39,6 +37,7 @@ namespace HomieManagement
       {
         options.JsonSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
       });
+
       services.AddDbContext<HomieManagementContext>();
 
       // Services
@@ -83,7 +82,7 @@ namespace HomieManagement
 
       // Start App
       serviceProvider.GetService<HomieManagementContext>().Initialize();
-      serviceProvider.GetService<MQTTManager>().Connect();
+      serviceProvider.GetService<MQTTManager>().Connect().Wait();
     }
   }
 }

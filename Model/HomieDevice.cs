@@ -216,7 +216,7 @@ namespace HomieManagement.Model
         var change = DeviceConfig.CreateChangeObject(Config, newConfig);
         var json = change.ToJSON();
         if (json != "{}")
-          MQTTManager.Publish(new PublishMessage(GetConfigTopic() + "/set", json));
+          MQTTManager.Publish(new PublishMessage(GetConfigTopic() + "/set", json)).Wait();
         return true;
       }
       catch (Exception ex)
@@ -230,7 +230,7 @@ namespace HomieManagement.Model
     {
       try
       {
-        MQTTManager.Publish(new PublishMessage(GetResetTopic(), "true"));
+        MQTTManager.Publish(new PublishMessage(GetResetTopic(), "true")).Wait();
         return true;
       }
       catch (Exception ex)
@@ -244,7 +244,7 @@ namespace HomieManagement.Model
     {
       try
       {
-        var publishSuccess = MQTTManager.Publish(new PublishMessage(GetFWChecksumTopic(checksum), firmware));
+        var publishSuccess = MQTTManager.Publish(new PublishMessage(GetFWChecksumTopic(checksum), firmware)).Result;
         if (publishSuccess)
         {
           var code = MQTTManager.WaitForMessage(GetFWStatusTopic(), doSee: false, timeout: TimeSpan.FromSeconds(20)).Result;

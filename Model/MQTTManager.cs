@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
@@ -6,11 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using uPLibrary.Networking.M2Mqtt;
-using uPLibrary.Networking.M2Mqtt.Messages;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MQTTnet;
+using MQTTnet.Core;
+using MQTTnet.Core.Client;
+using MQTTnet.Core.Packets;
+using MQTTnet.Core.Protocol;
 using HomieManagement.Config;
+
 
 namespace HomieManagement.Model
 {
@@ -20,15 +24,11 @@ namespace HomieManagement.Model
   public class MQTTManager
   {
     private ILogger Logger { get; }
-
     private AppConfig Config { get; }
-    private Timer Timer { get; }
-
-    private MqttClient Client { get; set; }
-    private bool InConnecting { get; set; }
-
+    private IMqttClient Client { get; }
+    CancellationToken ProccessingTaskToken { get; }
+    private Task ProccessingTask { get; }
     private ConcurrentDictionary<Guid, SubscriptionMessage> Messages { get; }
-    private bool NewListeners { get; set; }
     private ConcurrentDictionary<Guid, Listener> Listeners { get; }
 
 
@@ -37,56 +37,58 @@ namespace HomieManagement.Model
       Logger = logger;
       Config = config.Value;
 
-      Timer = new Timer(CheckConnect, null, 10000, 10000);
       Messages = new ConcurrentDictionary<Guid, SubscriptionMessage>();
-      NewListeners = false;
       Listeners = new ConcurrentDictionary<Guid, Listener>();
-    }
 
-    public bool Connect()
-    {
-      var status = false;
-      try
+      // MQTT Setup
+      Client = new MqttClientFactory().CreateMqttClient();
+      Client.ApplicationMessageReceived += Client_ReceivedMQTTMessage;
+      Client.Connected += async (s, e) =>
       {
-        if (!InConnecting)
+
+        await Task.Delay(TimeSpan.FromSeconds(1));
+        await Subscribe();
+      };
+      Client.Disconnected += async (s, e) =>
+       {
+         await Task.Delay(TimeSpan.FromSeconds(5));
+
+         await Connect();
+       };
+
+      // ProccessingTask
+      ProccessingTaskToken = new CancellationToken();
+      ProccessingTask = Task.Factory.StartNew(async () =>
+      {
+        while (true)
         {
-          InConnecting = true;
-
-          Client = new MqttClient(Config.MqttHostName, Config.Port, false, null, null, MqttSslProtocols.None);
-          Client.MqttMsgPublishReceived += OnMqttMessage;
-          byte result = Client.Connect("HomieManagement", Config.UserName, Config.Password, true, MqttSettings.MQTT_DEFAULT_TIMEOUT);
-
-          if (result == 0)
-          {
-            Subscribe();
-            status = true;
-          }
+          ProccessingTaskToken.ThrowIfCancellationRequested();
+          ProccessMessage();
+          await Task.Delay(100);
         }
-      }
-      catch (Exception ex)
-      {
-        Logger.LogError("An Error Occured: {0} \r\nStack: {1}", ex.Message, ex.StackTrace);
-      }
-      InConnecting = false;
-      return status;
+      }, ProccessingTaskToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
     }
 
-    //Private
-    private void CheckConnect(object state)
-    {
-      if (Client != null && !Client.IsConnected)
-      {
-        Connect();
-        ProccessMessage();
-      }
-    }
-
-    private void OnMqttMessage(object sender, MqttMsgPublishEventArgs e)
+    public async Task<bool> Connect()
     {
       try
       {
-        AddMessage(new SubscriptionMessage(e.Topic, BytesToString(e.Message), e.QosLevel, e.Retain, e.DupFlag));
-        ProccessMessage();
+        await Client.ConnectAsync(Config.MQTTConfig);
+        return Client.IsConnected;
+      }
+      catch (Exception ex)
+      {
+        Logger.LogError("An Error Occured: {0} \r\nStack: {1}", ex.Message, ex.StackTrace);
+      }
+      return false;
+    }
+
+    private void Client_ReceivedMQTTMessage(object sender, MqttApplicationMessageReceivedEventArgs e)
+    {
+      try
+      {
+        AddMessage(new SubscriptionMessage(e.ApplicationMessage.Topic, BytesToString(e.ApplicationMessage.Payload), e.ApplicationMessage.QualityOfServiceLevel, e.ApplicationMessage.Retain));
       }
       catch (Exception ex)
       {
@@ -94,18 +96,10 @@ namespace HomieManagement.Model
       }
     }
 
-    private void Subscribe()
+    private async Task Subscribe()
     {
-      foreach (var sub in Config.RootDeviceTopicLevels)
-      {
-        var topic = sub + "#";
-        Subscribe(topic, 0);
-      }
-    }
-
-    private void Subscribe(string topic, byte qos)
-    {
-      Client.Subscribe(new string[] { topic }, new byte[] { qos });
+      var subs = Config.RootDeviceTopicLevels.Select(topic => new TopicFilter(topic + "#", MqttQualityOfServiceLevel.AtLeastOnce));
+      await Client.SubscribeAsync(subs);
     }
 
     private void ProccessMessage()
@@ -128,12 +122,6 @@ namespace HomieManagement.Model
 
       toRemoveMessages.ForEach(item => RemoveMessage(item));
       toRemoveListeners.ForEach(item => RemoveListner(item));
-
-      if (NewListeners)
-      {
-        NewListeners = false;
-        ProccessMessage();
-      }
     }
 
     private void AddMessage(SubscriptionMessage message)
@@ -153,7 +141,6 @@ namespace HomieManagement.Model
     {
       var id = Guid.NewGuid();
       while (!Listeners.TryAdd(id, listener)) { Thread.Sleep(100); };
-      NewListeners = true;
     }
 
     public void RemoveListner(Guid id)
@@ -161,11 +148,11 @@ namespace HomieManagement.Model
       while (!Listeners.TryRemove(id, out Listener item)) { Thread.Sleep(100); };
     }
 
-    public bool Publish(PublishMessage message)
+    public async Task<bool> Publish(PublishMessage message)
     {
       try
       {
-        Client.Publish(message.Topic, StringToBytes(message.Message), message.QosLevel, message.Retain);
+        await Client.PublishAsync(message.ToMQTTMessage());
         return true;
       }
       catch (Exception ex)
@@ -245,10 +232,10 @@ namespace HomieManagement.Model
   {
     public string Topic { get; }
     public string Message { get; }
-    public byte QosLevel { get; }
+    public MqttQualityOfServiceLevel QosLevel { get; }
     public bool Retain { get; }
 
-    public MQTTMessage(string topic, string msg, byte qosLevel, bool retain)
+    public MQTTMessage(string topic, string msg, MqttQualityOfServiceLevel qosLevel, bool retain)
     {
       Topic = topic;
       Message = msg;
@@ -265,18 +252,26 @@ namespace HomieManagement.Model
   public class PublishMessage : MQTTMessage
   {
 
-    public PublishMessage(string topic, string msg, bool retain = false, byte qosLevel = 1) : base(topic, msg, qosLevel, retain)
+    public PublishMessage(string topic, string msg, bool retain = false, MqttQualityOfServiceLevel qosLevel = MqttQualityOfServiceLevel.AtLeastOnce) : base(topic, msg, qosLevel, retain)
     {
+    }
+
+    public MqttApplicationMessage ToMQTTMessage()
+    {
+      return new MqttApplicationMessage(Topic, StringToBytes(Message), QosLevel, Retain);
+    }
+
+    private byte[] StringToBytes(string val)
+    {
+      return Encoding.UTF8.GetBytes(val);
     }
   }
 
   public class SubscriptionMessage : MQTTMessage
   {
     public bool Seen { get; set; }
-    public bool DupFlag { get; }
-    public SubscriptionMessage(string topic, string msg, byte qosLevel, bool retain, bool dupFlag) : base(topic, msg, qosLevel, retain)
+    public SubscriptionMessage(string topic, string msg, MqttQualityOfServiceLevel qosLevel, bool retain) : base(topic, msg, qosLevel, retain)
     {
-      DupFlag = dupFlag;
       Seen = false;
     }
   }

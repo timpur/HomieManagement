@@ -1,9 +1,19 @@
 {
   "AppConfig": {
-    "MqttHostName": "mqtt.server.com",
-    "Port": 1883,
-    "UserName": "username",
-    "Password": "password",
+    "MQTTConfig": {
+      "ClientId": "HomieManagement",
+      "Server": "server.com",
+      "Port": 1883,
+      "UserName": "username",
+      "Password": "password",
+      "CleanSession": true,
+      "TlsOptions": {
+        "UseTls": false,
+        "IgnoreCertificateRevocationErrors": true,
+        "IgnoreCertificateChainErrors": true,
+        "AllowUntrustedCertificates": true
+      }
+    },
     "RootDeviceTopicLevels": [
       "homie/",
       "test/"

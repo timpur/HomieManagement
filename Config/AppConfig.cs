@@ -1,22 +1,15 @@
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using MQTTnet.Core.Client;
 
 namespace HomieManagement.Config
 {
-    public class AppConfig
-    {
-        //MQTT
-        public string MqttHostName { get; set; }
-        public int Port { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
+  public class AppConfig
+  {
+    //MQTT
+    public MqttClientTcpOptions MQTTConfig { get; set; }
+    //Homie
+    public List<string> RootDeviceTopicLevels { get; set; }
 
-        //Homie
-        public List<string> RootDeviceTopicLevels { get; set; }
-
-    }
+  }
 }
