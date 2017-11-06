@@ -26,8 +26,7 @@ namespace HomieManagement.Model
     private ILogger Logger { get; }
     private AppConfig Config { get; }
     private IMqttClient Client { get; }
-    CancellationToken ProccessingTaskToken { get; }
-    private Task ProccessingTask { get; }
+    Timer ProccessTimer { get; set; }
     private ConcurrentDictionary<Guid, SubscriptionMessage> Messages { get; }
     private ConcurrentDictionary<Guid, Listener> Listeners { get; }
 
@@ -45,28 +44,17 @@ namespace HomieManagement.Model
       Client.ApplicationMessageReceived += Client_ReceivedMQTTMessage;
       Client.Connected += async (s, e) =>
       {
-
         await Task.Delay(TimeSpan.FromSeconds(1));
         await Subscribe();
       };
       Client.Disconnected += async (s, e) =>
        {
          await Task.Delay(TimeSpan.FromSeconds(5));
-
          await Connect();
        };
 
       // ProccessingTask
-      ProccessingTaskToken = new CancellationToken();
-      ProccessingTask = Task.Factory.StartNew(async () =>
-      {
-        while (true)
-        {
-          ProccessingTaskToken.ThrowIfCancellationRequested();
-          ProccessMessage();
-          await Task.Delay(100);
-        }
-      }, ProccessingTaskToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+      ProccessTimer = new Timer(ProccessTask, null, 500, 500);
 
     }
 
@@ -102,45 +90,69 @@ namespace HomieManagement.Model
       await Client.SubscribeAsync(subs);
     }
 
-    private void ProccessMessage()
+    private void ProccessTask(object state)
     {
-      var toRemoveMessages = new List<Guid>();
-      var toRemoveListeners = new List<Guid>();
-
-      var messages = Messages.Where(item => !item.Value.Seen);
-      foreach (var message in messages)
+      try
       {
-        var listeners = Listeners.Where(item => item.Value.MatchTopic(message.Value.Topic));
-        foreach (var listener in listeners)
-        {
-          listener.Value.Callback(message.Value);
-          if (listener.Value.Once) toRemoveListeners.Add(listener.Key);
-        }
-        if (message.Value.Seen) toRemoveMessages.Add(message.Key);
+        ProccessMessage();
+      }
+      catch (Exception ex)
+      {
 
       }
+    }
 
-      toRemoveMessages.ForEach(item => RemoveMessage(item));
+    private void ProccessMessage()
+    {
+      try
+      {
+        var messages = Messages.Where(item => !item.Value.Seen).OrderBy(item => item.Value.Recived).ToList();
+        foreach (var message in messages)
+        {
+          ProccessMessageListerner(message.Value);
+          if (message.Value.Seen || message.Value.Count > 100)
+            RemoveMessage(message.Key);
+        }
+      }
+      catch (Exception ex)
+      {
+        Logger.LogError("An Error Occured: {0} \r\nStack: {1}", ex.Message, ex.StackTrace);
+      }
+    }
+
+    private void ProccessMessageListerner(SubscriptionMessage message)
+    {
+      var toRemoveListeners = new List<Guid>();
+
+      var listeners = Listeners.Where(item => item.Value.MatchTopic(message.Topic));
+      foreach (var listener in listeners)
+      {
+        listener.Value.Callback(message);
+        if (listener.Value.Once) toRemoveListeners.Add(listener.Key);
+      }
+
       toRemoveListeners.ForEach(item => RemoveListner(item));
     }
 
     private void AddMessage(SubscriptionMessage message)
     {
+      //Logger.LogInformation($"New MQTT Message: {message.ToString()}");
       var id = Guid.NewGuid();
-      while (!Messages.TryAdd(id, message)) { Thread.Sleep(100); };
+      while (!Messages.TryAdd(id, message)) { Thread.Sleep(1); };
     }
 
     private void RemoveMessage(Guid id)
     {
-      while (!Messages.TryRemove(id, out SubscriptionMessage item)) { Thread.Sleep(100); };
+      while (!Messages.TryRemove(id, out SubscriptionMessage item)) { Thread.Sleep(10); };
     }
 
     //Public
 
-    public void AddListner(Listener listener)
+    public Guid AddListner(Listener listener)
     {
       var id = Guid.NewGuid();
       while (!Listeners.TryAdd(id, listener)) { Thread.Sleep(100); };
+      return id;
     }
 
     public void RemoveListner(Guid id)
@@ -179,7 +191,31 @@ namespace HomieManagement.Model
         var start = DateTime.Now;
         while (message == null && (DateTime.Now - start) < timeout)
         {
-          await Task.Delay(100);
+          await Task.Delay(10);
+        }
+        return message;
+      });
+    }
+    public async Task<SubscriptionMessage> WaitForMessage(string topicRegex, string messageRegex, TimeSpan timeout = default, bool doSee = true)
+    {
+      if (timeout.Ticks == 0)
+        timeout = TimeSpan.FromSeconds(10);
+
+      SubscriptionMessage message = null;
+      bool found = false;
+
+      AddListner(new Listener(topicRegex, (msg) =>
+      {
+        message = msg;
+        found = Regex.IsMatch(message?.Message, messageRegex);
+      }, true, doSee));
+
+      return await Task.Run(async () =>
+      {
+        var start = DateTime.Now;
+        while (message == null && !found && (DateTime.Now - start) < timeout)
+        {
+          await Task.Delay(10);
         }
         return message;
       });
@@ -270,9 +306,16 @@ namespace HomieManagement.Model
   public class SubscriptionMessage : MQTTMessage
   {
     public bool Seen { get; set; }
+
+    protected byte count;
+    public byte Count { get { return ++count; } }
+
+    public DateTime Recived { get; }
     public SubscriptionMessage(string topic, string msg, MqttQualityOfServiceLevel qosLevel, bool retain) : base(topic, msg, qosLevel, retain)
     {
       Seen = false;
+      count = 0;
+      Recived = DateTime.Now;
     }
   }
 

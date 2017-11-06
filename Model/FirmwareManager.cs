@@ -136,6 +136,10 @@ namespace HomieManagement.Model
         {
           return new Result(true, "Update was accepted, flashing");
         }
+        if (code.StartsWith("206"))
+        {
+          return new Result(true, "Missed start sequence, Update inprogress allready.");
+        }
         else if (code.StartsWith("304"))
         {
           return new Result(false, "The device is already on this version");

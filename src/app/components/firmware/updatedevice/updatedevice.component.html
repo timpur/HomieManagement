@@ -34,7 +34,6 @@
         <div [ngSwitch]="updateStage">
           <div *ngSwitchCase="0">
             <h2>Update Not Started</h2>
-            <button mat-raised-button color="primary" matStepperPrevious>Back</button>
             <button mat-raised-button color="accent" (click)="startUpdate()">Start Updating</button>
           </div>
           <div *ngSwitchCase="1">

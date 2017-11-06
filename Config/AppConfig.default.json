@@ -7,6 +7,8 @@
       "UserName": "username",
       "Password": "password",
       "CleanSession": true,
+      "KeepAlivePeriod": "00:00:05",
+      "DefaultCommunicationTimeout": "00:00:10",
       "TlsOptions": {
         "UseTls": false,
         "IgnoreCertificateRevocationErrors": true,

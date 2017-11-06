@@ -247,7 +247,7 @@ namespace HomieManagement.Model
         var publishSuccess = MQTTManager.Publish(new PublishMessage(GetFWChecksumTopic(checksum), firmware)).Result;
         if (publishSuccess)
         {
-          var code = MQTTManager.WaitForMessage(GetFWStatusTopic(), doSee: false, timeout: TimeSpan.FromSeconds(20)).Result;
+          var code = MQTTManager.WaitForMessage(GetFWStatusTopic(), doSee: false, timeout: TimeSpan.FromSeconds(30)).Result;
           return (true, code?.Message ?? "Faild to recive status");
         }
         else
