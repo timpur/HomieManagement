@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Content Remove=".angular-cli.json" />
+    <Content Remove="Config\AppConfig.json" />
     <Content Remove="package.json" />
     <Content Remove="proxy.config.json" />
     <Content Remove="src\tsconfig.app.json" />
@@ -46,6 +47,7 @@
 
   <ItemGroup>
     <None Include=".angular-cli.json" />
+    <None Include="Config\AppConfig.json" />
     <None Include="package.json" />
     <None Include="proxy.config.json" />
     <None Include="src\tsconfig.app.json" />

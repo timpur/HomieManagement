@@ -49,7 +49,7 @@
       <p class="mat-body-2">Device Settings</p>
       <div>
         <div *ngFor="let setting of Device.Config.getSettingsKeys()">
-          <span [ngSwitch]="type(Device.Config.Settings[setting])">
+          <span [ngSwitch]="settingType(setting)">
             <mat-form-field *ngSwitchCase="'string'">
               <input matInput placeholder="{{setting}}" [(ngModel)]="Device.Config.Settings[setting]" type="text">
             </mat-form-field>

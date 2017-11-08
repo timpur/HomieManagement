@@ -500,17 +500,14 @@ namespace HomieManagement.Model
 
       private static Dictionary<string, object> CreateChangeSettings(Dictionary<string, object> currentSettings, Dictionary<string, object> newSettings)
       {
-        var change = new Dictionary<string, object>();
-        var changed = false;
-        foreach (var item in newSettings)
+        var add = newSettings.Except(currentSettings).ToDictionary(x => x.Key, x => x.Value);
+        var remove = currentSettings.Except(newSettings).ToDictionary(x => x.Key, x => x.Value);
+        foreach (var item in remove)
         {
-          if (currentSettings.ContainsKey(item.Key) && !currentSettings[item.Key].Equals(item.Value))
-          {
-            change.Add(item.Key, item.Value);
-            changed = true;
-          }
+          add.Add(item.Key, null);
         }
-        return changed ? change : null;
+        var changed = add.Count() != 0 || remove.Count() != 0;
+        return changed ? add : null;
       }
 
     }

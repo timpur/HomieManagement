@@ -112,8 +112,12 @@ export class HomieHubService {
         return TypedJSON.parse(JSON.stringify(res), Result) as Result
       })
       .then((res) => {
-        let status: string = res.Success ? "Success" : "Fail";
-        this.notify(`Config Update was a ${status}`);
+        if (res.Success) {
+          this.notify('Config Update was a Success');
+        }
+        else {
+          this.notify(`Config Update was a Fail: ${res.Message}`);
+        }
       });
   }
 
@@ -123,8 +127,12 @@ export class HomieHubService {
         return TypedJSON.parse(JSON.stringify(res), Result) as Result
       })
       .then((res) => {
-        let status: string = res.Success ? "Success" : "Fail";
-        this.notify(`Device Reset was a ${status}`);
+        if (res.Success) {
+          this.notify('Device Reset was a Success');
+        }
+        else {
+          this.notify(`Device Reset was a Fail: ${res.Message}`);
+        }
       });
   }
 
@@ -146,8 +154,12 @@ export class HomieHubService {
         return TypedJSON.parse(JSON.stringify(res), Result) as Result
       })
       .then((res) => {
-        let status: string = res.Success ? "Success" : "Fail";
-        this.notify(`Adding Firmware was a ${status}`);
+        if (res.Success) {
+          this.notify('Adding Firmware was a Success');
+        }
+        else {
+          this.notify(`Adding Firmware was a Fail: ${res.Message}`);
+        }
       });
   }
 
@@ -157,8 +169,12 @@ export class HomieHubService {
         return TypedJSON.parse(JSON.stringify(res), Result) as Result
       })
       .then((res) => {
-        let status: string = res.Success ? "Success" : "Fail";
-        this.notify(`Removing Firmware was a ${status}`);
+        if (res.Success) {
+          this.notify('Removing Firmware was a Success');
+        }
+        else {
+          this.notify(`Removing Firmware was a Fail: ${res.Message}`);
+        }
       });
   }
 

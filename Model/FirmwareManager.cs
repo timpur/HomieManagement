@@ -56,7 +56,7 @@ namespace HomieManagement.Model
       if (!ValidFirmware(firmware))
         return new Result(false, "Firmware is not Valid");
 
-      if (!HomieManagement.FirmwareExists(firmware))
+      if (HomieManagement.FirmwareExists(firmware))
         return new Result(false, "Firmware already Exists");
 
       HomieManagement.AddFirmware(firmware);

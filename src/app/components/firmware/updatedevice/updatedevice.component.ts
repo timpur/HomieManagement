@@ -93,6 +93,7 @@ export class UpdateDeviceDialogComponent implements OnInit {
   public getProgress() {
 
     let status = this.device.OTAStatus;
+    if (status == null) status = "";
 
     if (status.startsWith("200")) {
       this.wrBytes = this.totalBytes;
@@ -109,6 +110,11 @@ export class UpdateDeviceDialogComponent implements OnInit {
           this.totalBytes = Number(total);
         }
       }
+    }
+    //Impement all errors
+    else if (status.startsWith("400")) {
+      this.updateStage = UpdateStages.Error;
+      this.displayMSG = status;
     }
     else if (status.startsWith("500")) {
       this.updateStage = UpdateStages.Error;

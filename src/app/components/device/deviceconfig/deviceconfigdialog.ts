@@ -12,14 +12,19 @@ export class DeviceConfigDialog {
   public Device: HomieDevice;
   public AddSetting: AddSetting;
 
+  public SettingTypes: Map<string, string>;
+
   public Types: Array<string> = ["Text", "Number", "Boolean"];
 
   constructor() {
     this.AddSetting = new AddSetting();
+    this.SettingTypes = new Map();
   }
 
-  public type(item) {
-    return typeof item;
+  public settingType(settingName: string) {
+    if (!this.SettingTypes.has(settingName))
+      this.SettingTypes.set(settingName, typeof this.Device.Config.Settings[settingName]);
+    return this.SettingTypes.get(settingName);
   }
 
   public Add(): void {
@@ -35,6 +40,11 @@ export class DeviceConfigDialog {
         break;
     }
     this.AddSetting = new AddSetting();
+  }
+
+  public Remove(settingName) {
+    delete this.Device.Config.Settings[settingName];
+    this.SettingTypes.delete(settingName);
   }
 }
 class AddSetting {

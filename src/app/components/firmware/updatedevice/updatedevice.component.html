@@ -12,6 +12,13 @@
             <mat-option *ngFor="let device of devices" [value]="device" [matTooltip]="device.Config.DeviceID" matTooltipPosition="above">{{device.Name}}</mat-option>
           </mat-select>
         </mat-form-field>
+        <div class="inline">
+          <span>OTA Enabled: {{device?.OTAEnabled ? "Yes" : "No"}}</span>
+          <br />
+          <span>Firmware Name: {{device?.FWName}}</span>
+          <br />
+          <span>Firmware Version: {{device?.FWVersion}}</span>
+        </div>
         <br />
         <mat-form-field style="width:300px">
           <mat-select #firmwareName name="firmwareName" placeholder="Firmware" [(ngModel)]="selectedFirmwareChain" required>
