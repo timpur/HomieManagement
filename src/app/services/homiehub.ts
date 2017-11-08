@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { APP_BASE_HREF } from '@angular/common';
 import { HubConnection } from '@aspnet/signalr-client';
 import { TypedJSON, JsonObject, JsonMember } from '@upe/typedjson';
 import { MatSnackBar } from '@angular/material';
@@ -18,24 +18,35 @@ export class HomieHubService {
   public FirmwareList: ArrayDatabase<Firmware>;
 
 
-  constructor(public snackBar: MatSnackBar) {
+  constructor(private snackBar: MatSnackBar) {
     this.Devices = new ArrayDatabase<HomieDevice>();
     this.FirmwareList = new ArrayDatabase<Firmware>();
     this.connect();
   }
 
   connect() {
-    this.homieHubConnection = new HubConnection('/signalr/homiehub');
+    let base = "/";
+    try {
+      base = document.getElementsByTagName("base").item(0).attributes.getNamedItem("href").textContent;
+    } catch (e) {
+      this.notify("Error: Couldnt find base reff");
+    }
+
+    this.homieHubConnection = new HubConnection(`${base}signalr/homiehub`);
 
     // Listners
     this.onDeviceUpdate();
     this.onDeviceNodeUpdate();
     this.onDeviceNodePropertyUpdate();
 
+    this.homieHubConnection.onclose((error) => {
+      this.notify(`Homie Hub Dissconneced. Error: ${error.name} : ${error.message}`);
+    });
+
     this.homieHubConnection.start().then(() => {
       this.getDevices();
       this.getFirmwareList();
-    })
+    });
   }
 
   onDeviceUpdate() {
