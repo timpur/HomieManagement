@@ -45,7 +45,8 @@ namespace HomieManagement.Model
       Client.Connected += async (s, e) =>
       {
         await Task.Delay(TimeSpan.FromSeconds(1));
-        await Subscribe();
+        if (Client.IsConnected)
+          await Subscribe();
       };
       Client.Disconnected += async (s, e) =>
        {
@@ -98,7 +99,7 @@ namespace HomieManagement.Model
       }
       catch (Exception ex)
       {
-
+        Logger.LogError("An Error Occured: {0} \r\nStack: {1}", ex.Message, ex.StackTrace);
       }
     }
 
@@ -136,7 +137,7 @@ namespace HomieManagement.Model
 
     private void AddMessage(SubscriptionMessage message)
     {
-      //Logger.LogInformation($"New MQTT Message: {message.ToString()}");
+      Logger.LogInformation($"New MQTT Message: {message.ToString()}");
       var id = Guid.NewGuid();
       while (!Messages.TryAdd(id, message)) { Thread.Sleep(1); };
     }

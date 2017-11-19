@@ -477,7 +477,12 @@ namespace HomieManagement.Model
            (WiFi != null ? WiFi.GetHashCode() : 0) +
            (MQTT != null ? MQTT.GetHashCode() : 0) +
            (OTA != null ? OTA.GetHashCode() : 0) +
-           (Settings != null ? Settings.Select(item => (item.Key.GetHashCode() + item.Value.GetHashCode()).GetHashCode()).Sum(item => (long)item).GetHashCode() : 0);
+           (Settings != null ? HashDictonary(Settings) : 0);
+      }
+
+      private int HashDictonary<K, V>(Dictionary<K, V> dictionary)
+      {
+        return dictionary.Select(x => (x.Key?.GetHashCode() + x.Value?.GetHashCode()).GetHashCode()).Sum(x => (long)x).GetHashCode();
       }
 
       public static DeviceConfig CreateChangeObject(DeviceConfig currentConfig, DeviceConfig newConfig)

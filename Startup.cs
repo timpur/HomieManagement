@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using HomieManagement.Controllers;
 using HomieManagement.Model;
 using HomieManagement.Model.DataBase;
 using HomieManagement.Config;
+
 
 namespace HomieManagement
 {
@@ -51,7 +53,7 @@ namespace HomieManagement
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider, ILogger<Startup> logger)
     {
       if (env.IsDevelopment())
       {
@@ -81,8 +83,15 @@ namespace HomieManagement
       app.UseStaticFiles();
 
       // Start App
-      serviceProvider.GetService<HomieManagementContext>().Initialize();
-      serviceProvider.GetService<MQTTManager>().Connect().Wait();
+      try
+      {
+        serviceProvider.GetService<HomieManagementContext>().Initialize();
+        serviceProvider.GetService<MQTTManager>().Connect().Wait();
+      }
+      catch (Exception ex)
+      {
+        logger.LogError("An Error Occured: {0} \r\nStack: {1}", ex.Message, ex.StackTrace);
+      }
     }
   }
 }
