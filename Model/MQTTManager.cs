@@ -27,7 +27,7 @@ namespace HomieManagement.Model
     private ILogger Logger { get; }
     private AppConfig Config { get; }
     private IManagedMqttClient Client { get; }
-    Timer ProccessTimer { get; set; }
+    private Timer ProccessTimer { get; set; }
     private ConcurrentDictionary<Guid, SubscriptionMessage> Messages { get; }
     private ConcurrentDictionary<Guid, Listener> Listeners { get; }
 
@@ -52,29 +52,20 @@ namespace HomieManagement.Model
       {
         Logger.LogInformation("Client Disconnected");
       };
+    }
+
+    public void Start()
+    {
+      Logger.LogInformation("Started MQTT Manager");
+
+      // Start client
       Client.StartAsync(new ManagedMqttClientOptions
       {
         ClientOptions = Config.MQTTConfig.Options(),
         AutoReconnectDelay = TimeSpan.FromSeconds(5)
       }).Wait();
-
-      // ProccessingTask
+      // Start Proccess Task
       ProccessTimer = new Timer(ProccessTask, null, 500, 500);
-
-    }
-
-    public async Task<bool> Connect()
-    {
-      try
-      {
-        //await Client.ConnectAsync(Config.MQTTConfig);
-        return Client.IsConnected;
-      }
-      catch (Exception ex)
-      {
-        Logger.LogError("An Error Occured: {0} \r\nStack: {1}", ex.Message, ex.StackTrace);
-      }
-      return false;
     }
 
     private void Client_ReceivedMQTTMessage(object sender, MqttApplicationMessageReceivedEventArgs e)
@@ -87,11 +78,6 @@ namespace HomieManagement.Model
       {
         Logger.LogError("An Error Occured: {0} \r\nStack: {1}", ex.Message, ex.StackTrace);
       }
-    }
-
-    private async Task Subscribe()
-    {
-      await Client.SubscribeAsync(Config.RootDeviceTopicLevels.Select(topic => new TopicFilter(topic + "#", MqttQualityOfServiceLevel.AtLeastOnce)));
     }
 
     private void ProccessTask(object state)
@@ -304,7 +290,7 @@ namespace HomieManagement.Model
 
     public MqttApplicationMessage ToMQTTMessage()
     {
-      return new MqttApplicationMessage(Topic, StringToBytes(Message), QosLevel, Retain);
+      return new MqttApplicationMessageBuilder().WithTopic(Topic).WithPayload(Message).WithQualityOfServiceLevel(QosLevel).WithRetainFlag(Retain).Build();
     }
 
     private byte[] StringToBytes(string val)

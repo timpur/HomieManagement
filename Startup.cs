@@ -86,7 +86,7 @@ namespace HomieManagement
       try
       {
         serviceProvider.GetService<HomieManagementContext>().Initialize();
-        serviceProvider.GetService<MQTTManager>().Connect().Wait();
+        serviceProvider.GetService<MQTTManager>().Start();
       }
       catch (Exception ex)
       {
