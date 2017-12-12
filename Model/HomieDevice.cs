@@ -344,7 +344,6 @@ namespace HomieManagement.Model
             Type = message;
             break;
           case "/$properties":
-            var root = MQTTRootTopicLevel + topic;
             var properties = message.Split(',');
             foreach (var propertyString in properties)
             {
@@ -357,7 +356,7 @@ namespace HomieManagement.Model
                 var settable = match.Groups["Settable"].Success;
                 if (!range)
                 {
-                  AddProperty(root, name, settable);
+                  AddProperty(name, settable);
                 }
                 else
                 {
@@ -365,7 +364,7 @@ namespace HomieManagement.Model
                   var to = Int32.Parse(match.Groups["RangeTo"].Value);
                   for (int i = from; i <= to; ++i)
                   {
-                    AddProperty(root, name + "_" + i, settable);
+                    AddProperty(name + "_" + i, settable);
                   }
                 }
               }
@@ -384,11 +383,14 @@ namespace HomieManagement.Model
         return true;
       }
 
-      private void AddProperty(string root, string propertyID, bool settable)
+      private void AddProperty(string propertyID, bool settable)
       {
-        var prop = new NodeProperty(root + propertyID, propertyID, settable);
-        prop.ChangeEvent += (diff) => PropertyChangeEvent?.Invoke(this, diff);
-        Properties.Add(prop);
+        if (!Properties.Exists(x => x.PropertyID == propertyID))
+        {
+          var prop = new NodeProperty($"{MQTTRootTopicLevel}/{propertyID}", propertyID, settable);
+          prop.ChangeEvent += (diff) => PropertyChangeEvent?.Invoke(this, diff);
+          Properties.Add(prop);
+        }
       }
 
     }

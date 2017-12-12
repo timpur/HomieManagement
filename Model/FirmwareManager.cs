@@ -132,11 +132,15 @@ namespace HomieManagement.Model
       if (result.sent)
       {
 
-        if (code.StartsWith("202"))
+        if (code.StartsWith("200"))
+        {
+          return new Result(true, "Update was Successful");
+        }
+        else if (code.StartsWith("202"))
         {
           return new Result(true, "Update was accepted, flashing");
         }
-        if (code.StartsWith("206"))
+        else if (code.StartsWith("206"))
         {
           return new Result(true, "Missed start sequence, Update inprogress allready.");
         }

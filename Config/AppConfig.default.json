@@ -2,18 +2,22 @@
   "AppConfig": {
     "MQTTConfig": {
       "ClientId": "HomieManagement",
-      "Server": "server.com",
-      "Port": 1883,
-      "UserName": "username",
-      "Password": "password",
       "CleanSession": true,
       "KeepAlivePeriod": "00:00:05",
-      "DefaultCommunicationTimeout": "00:00:10",
-      "TlsOptions": {
-        "UseTls": false,
-        "IgnoreCertificateRevocationErrors": true,
-        "IgnoreCertificateChainErrors": true,
-        "AllowUntrustedCertificates": true
+      "CommunicationTimeout": "00:00:10",
+      "ServerOptions": {
+        "Server": "server.com",
+        "Port": 1883,
+        "TlsOptions": {
+          "UseTls": false,
+          "IgnoreCertificateRevocationErrors": true,
+          "IgnoreCertificateChainErrors": true,
+          "AllowUntrustedCertificates": true
+        }
+      },
+      "Credentials": {
+        "UserName": "username",
+        "Password": "password"
       }
     },
     "RootDeviceTopicLevels": [

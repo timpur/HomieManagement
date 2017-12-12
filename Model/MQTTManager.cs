@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Core;
 using MQTTnet.Core.Client;
+using MQTTnet.Core.ManagedClient;
 using MQTTnet.Core.Packets;
 using MQTTnet.Core.Protocol;
 using HomieManagement.Config;
@@ -25,7 +26,7 @@ namespace HomieManagement.Model
   {
     private ILogger Logger { get; }
     private AppConfig Config { get; }
-    private IMqttClient Client { get; }
+    private IManagedMqttClient Client { get; }
     Timer ProccessTimer { get; set; }
     private ConcurrentDictionary<Guid, SubscriptionMessage> Messages { get; }
     private ConcurrentDictionary<Guid, Listener> Listeners { get; }
@@ -40,19 +41,22 @@ namespace HomieManagement.Model
       Listeners = new ConcurrentDictionary<Guid, Listener>();
 
       // MQTT Setup
-      Client = new MqttClientFactory().CreateMqttClient();
+      Client = new MqttFactory().CreateManagedMqttClient();
       Client.ApplicationMessageReceived += Client_ReceivedMQTTMessage;
-      Client.Connected += async (s, e) =>
+      Client.SubscribeAsync(Config.RootDeviceTopicLevels.Select(topic => new TopicFilter(topic + "#", MqttQualityOfServiceLevel.AtLeastOnce))).Wait();
+      Client.Connected += (s, e) =>
       {
-        await Task.Delay(TimeSpan.FromSeconds(1));
-        if (Client.IsConnected)
-          await Subscribe();
+        Logger.LogInformation("Client Connected");
       };
-      Client.Disconnected += async (s, e) =>
-       {
-         await Task.Delay(TimeSpan.FromSeconds(5));
-         await Connect();
-       };
+      Client.Disconnected += (s, e) =>
+      {
+        Logger.LogInformation("Client Disconnected");
+      };
+      Client.StartAsync(new ManagedMqttClientOptions
+      {
+        ClientOptions = Config.MQTTConfig.Options(),
+        AutoReconnectDelay = TimeSpan.FromSeconds(5)
+      }).Wait();
 
       // ProccessingTask
       ProccessTimer = new Timer(ProccessTask, null, 500, 500);
@@ -63,7 +67,7 @@ namespace HomieManagement.Model
     {
       try
       {
-        await Client.ConnectAsync(Config.MQTTConfig);
+        //await Client.ConnectAsync(Config.MQTTConfig);
         return Client.IsConnected;
       }
       catch (Exception ex)
@@ -87,8 +91,7 @@ namespace HomieManagement.Model
 
     private async Task Subscribe()
     {
-      var subs = Config.RootDeviceTopicLevels.Select(topic => new TopicFilter(topic + "#", MqttQualityOfServiceLevel.AtLeastOnce));
-      await Client.SubscribeAsync(subs);
+      await Client.SubscribeAsync(Config.RootDeviceTopicLevels.Select(topic => new TopicFilter(topic + "#", MqttQualityOfServiceLevel.AtLeastOnce)));
     }
 
     private void ProccessTask(object state)
@@ -111,7 +114,7 @@ namespace HomieManagement.Model
         foreach (var message in messages)
         {
           ProccessMessageListerner(message.Value);
-          if (message.Value.Seen || message.Value.Count > 100)
+          if (message.Value.Seen || message.Value.Count > 50)
             RemoveMessage(message.Key);
         }
       }
@@ -137,14 +140,20 @@ namespace HomieManagement.Model
 
     private void AddMessage(SubscriptionMessage message)
     {
-      Logger.LogInformation($"New MQTT Message: {message.ToString()}");
+      //Logger.LogInformation($"New MQTT Message: {message.ToString()}");
       var id = Guid.NewGuid();
-      while (!Messages.TryAdd(id, message)) { Thread.Sleep(1); };
+      while (!Messages.TryAdd(id, message))
+      {
+        Thread.Sleep(1);
+      };
     }
 
     private void RemoveMessage(Guid id)
     {
-      while (!Messages.TryRemove(id, out SubscriptionMessage item)) { Thread.Sleep(10); };
+      while (Messages.ContainsKey(id) && !Messages.TryRemove(id, out SubscriptionMessage item))
+      {
+        Thread.Sleep(1);
+      };
     }
 
     //Public
