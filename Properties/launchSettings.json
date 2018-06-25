@@ -16,7 +16,7 @@
         "ASPNETCORE_HTTPS_PORT": "44386"
       }
     },
-    "HomieManagement_Redesign": {
+    "HomieManagement": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

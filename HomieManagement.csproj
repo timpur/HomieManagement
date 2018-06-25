@@ -9,8 +9,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL" Version="0.17.3" />
-    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.0-preview1-final" />
+    <PackageReference Include="GraphQL" Version="2.0.0-alpha-927" />
+    <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="3.1.0-alpha0022" />
+    <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="3.1.0-alpha0022" />
+    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="3.1.0-alpha0022" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.0" />
   </ItemGroup>
 
 </Project>
