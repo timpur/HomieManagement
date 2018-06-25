@@ -11596,9 +11596,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\timothy.TPF\\Documents\\GitHub\\HomieManagement_Redesign\\HomieManagement_Redesign.csproj",
-      "projectName": "HomieManagement_Redesign",
-      "projectPath": "C:\\Users\\timothy.TPF\\Documents\\GitHub\\HomieManagement_Redesign\\HomieManagement_Redesign.csproj",
+      "projectUniqueName": "C:\\Users\\timothy.TPF\\Documents\\GitHub\\HomieManagement_Redesign\\HomieManagement.csproj",
+      "projectName": "HomieManagement",
+      "projectPath": "C:\\Users\\timothy.TPF\\Documents\\GitHub\\HomieManagement_Redesign\\HomieManagement.csproj",
       "packagesPath": "C:\\Users\\timothy.TPF\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\timothy.TPF\\Documents\\GitHub\\HomieManagement_Redesign\\obj\\",
       "projectStyle": "PackageReference",
