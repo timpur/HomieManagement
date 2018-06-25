@@ -2,6 +2,34 @@
   "version": 3,
   "targets": {
     ".NETCoreApp,Version=v2.1": {
+      "GraphQL/0.17.3": {
+        "type": "package",
+        "dependencies": {
+          "GraphQL-Parser": "2.0.0",
+          "NETStandard.Library": "1.6.1",
+          "Newtonsoft.Json": "9.0.1",
+          "System.Reflection.Extensions": "4.3.0",
+          "System.Reflection.TypeExtensions": "4.0.0"
+        },
+        "compile": {
+          "lib/netstandard1.1/GraphQL.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.1/GraphQL.dll": {}
+        }
+      },
+      "GraphQL-Parser/2.0.0": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0"
+        },
+        "compile": {
+          "lib/netstandard1.1/GraphQL-Parser.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.1/GraphQL-Parser.dll": {}
+        }
+      },
       "Libuv/1.10.0": {
         "type": "package",
         "dependencies": {
@@ -4482,6 +4510,28 @@
     }
   },
   "libraries": {
+    "GraphQL/0.17.3": {
+      "sha512": "OKqDDo1foDvhaXVgaCs5OJFYEkMtfgM1zaWRLFSibQQV7GmP5nSVonXD9EvoRBISlprYcICoeOa3qzW89LSnJw==",
+      "type": "package",
+      "path": "graphql/0.17.3",
+      "files": [
+        "graphql.0.17.3.nupkg.sha512",
+        "graphql.nuspec",
+        "lib/net45/GraphQL.dll",
+        "lib/netstandard1.1/GraphQL.dll"
+      ]
+    },
+    "GraphQL-Parser/2.0.0": {
+      "sha512": "NozRK1xsJZexRjATvjabhYr/YEq9XBGs3XRDUFcH1M1qpLyYUzjIOX97/dOQ9sSEjYLd++fnulwiMq17m7zEpw==",
+      "type": "package",
+      "path": "graphql-parser/2.0.0",
+      "files": [
+        "graphql-parser.2.0.0.nupkg.sha512",
+        "graphql-parser.nuspec",
+        "lib/net45/GraphQL-Parser.dll",
+        "lib/netstandard1.1/GraphQL-Parser.dll"
+      ]
+    },
     "Libuv/1.10.0": {
       "sha512": "GsCf4q+eyaI49rCPlgYxdxa1SQCysXFFdSJWdstrwxytg4+VPYLYrXD4AT2rjHVJ+UF7SSWX9CapWEYaU4ejVQ==",
       "type": "package",
@@ -11584,6 +11634,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.1": [
+      "GraphQL >= 0.17.3",
       "Microsoft.AspNetCore.App >= 2.1.0-preview1-final",
       "Microsoft.NETCore.App >= 2.1.0-preview1-26216-03"
     ]
@@ -11596,11 +11647,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\timothy.TPF\\Documents\\GitHub\\HomieManagement_Redesign\\HomieManagement.csproj",
+      "projectUniqueName": "c:\\Users\\timothy.TPF\\Documents\\GitHub\\HomieManagement_Redesign\\HomieManagement.csproj",
       "projectName": "HomieManagement",
-      "projectPath": "C:\\Users\\timothy.TPF\\Documents\\GitHub\\HomieManagement_Redesign\\HomieManagement.csproj",
+      "projectPath": "c:\\Users\\timothy.TPF\\Documents\\GitHub\\HomieManagement_Redesign\\HomieManagement.csproj",
       "packagesPath": "C:\\Users\\timothy.TPF\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\timothy.TPF\\Documents\\GitHub\\HomieManagement_Redesign\\obj\\",
+      "outputPath": "c:\\Users\\timothy.TPF\\Documents\\GitHub\\HomieManagement_Redesign\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\",
@@ -11632,6 +11683,10 @@
     "frameworks": {
       "netcoreapp2.1": {
         "dependencies": {
+          "GraphQL": {
+            "target": "Package",
+            "version": "[0.17.3, )"
+          },
           "Microsoft.AspNetCore.App": {
             "target": "Package",
             "version": "[2.1.0-preview1-final, )"
