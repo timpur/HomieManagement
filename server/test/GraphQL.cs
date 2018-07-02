@@ -4,67 +4,56 @@ using Microsoft.AspNetCore.Mvc;
 using GraphQL;
 using GraphQL.Http;
 using GraphQL.Types;
+using GraphQL.Conventions;
+using GraphQL.Conventions.Relay;
+using System.Reflection;
+using GraphQL.Conventions.Types.Resolution;
+using GraphQL.Conventions.Adapters;
+using GraphQL.Conventions.Builders;
+using System.Linq;
 
 namespace HomieManagement
 {
-    [Route("api/test")]
-    [ApiController]
-    public class TestApp : Controller
+    public class QuerySchema : Schema
     {
-        public static async Task Run()
+        Schema _schema { get; }
+        public QuerySchema()
         {
-
-        }
-        [HttpGet]
-        [Route("test")]
-        public string Test()
-        {
-            var schema = new Schema { Query = new TestAppQuery() };
-            return schema.ToString();
+            _schema = CustomGraphQLEngine.New<Query>().GetSchema() as Schema;
+            Query = _schema.Query;
+            Mutation = _schema.Mutation;
+            Subscription = _schema.Subscription;
+            Directives = _schema.Directives;
+            FieldNameConverter = _schema.FieldNameConverter;
+            DependencyResolver = _schema.DependencyResolver;
         }
     }
 
-    public class TestAppSchema : Schema
+    [ImplementViewer(OperationType.Query)]
+    public class Query
     {
-        public TestAppSchema()
-        {
-            Query = new TestAppQuery();
-        }
+
+        [Description("Test Field")]
+        public string Test { get; set; } = "Test Field Value";
+
+        [Description("Get Users")]
+        public User GetUser(int id, string value = "Example") => new User(id, value);
     }
 
-    public class TestAppQuery : ObjectGraphType
+    [Description("User Object")]
+    public class User
     {
-        public TestAppQuery()
+        [Description("User ID")]
+        public int Id { get; }
+
+        [Description("User Value")]
+        public string Value { get; }
+
+        public User(int id, string value)
         {
-            Field<TestType>(
-              name: "test",
-              description: "Test des",
-              arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "param" }),
-              resolve: context => new Test(context.GetArgument<int>("param"))
-            );
-            Field<TestType>(
-              name: "test2",
-              arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "p" }),
-              resolve: context => new Test(context.GetArgument<int>("p"))
-            );
+            Id = id;
+            Value = value;
         }
     }
-
-    public class TestType : ObjectGraphType<Test>
-    {
-        public TestType()
-        {
-            Field(x => x.TestField).Description("The test field");
-        }
-    }
-    public class Test
-    {
-        public string TestField { get; set; }
-
-        public Test(int param)
-        {
-            TestField = param.ToString();
-        }
-    }
-
 }
+

@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,11 +10,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.0" />
     <PackageReference Include="GraphQL" Version="2.0.0-alpha-927" />
+    <PackageReference Include="GraphQL.Conventions" Version="1.4.0" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="3.1.0-alpha0022" />
+    <PackageReference Include="GraphQL.Server.Transports.WebSockets" Version="3.1.0-alpha0022" />
     <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="3.1.0-alpha0022" />
     <PackageReference Include="GraphQL.Server.Ui.Playground" Version="3.1.0-alpha0022" />
-    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.0" />
+    <PackageReference Include="MQTTnet" Version="2.7.5" />
+    <PackageReference Include="System.Reactive" Version="3.1.1" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
 </Project>

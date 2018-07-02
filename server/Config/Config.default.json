@@ -1,0 +1,33 @@
+{
+  "Config": {
+    "MQTT": {
+      "ClientId": "HomieManagement",
+      "CleanSession": true,
+      "KeepAlivePeriod": "00:00:15",
+      "KeepAliveSendInterval": "00:00:15",
+      "CommunicationTimeout": "00:00:30",
+      "ServerOptions": {
+        "Server": "server.com",
+        "Port": 1883,
+        "TlsOptions": {
+          "UseTls": false,
+          "IgnoreCertificateRevocationErrors": true,
+          "IgnoreCertificateChainErrors": true,
+          "AllowUntrustedCertificates": true
+        }
+      },
+      "Credentials": {
+        "UserName": "username",
+        "Password": "password"
+      }
+    },
+    "HomieTopics": [
+      "homie/"
+    ],
+    "HomieOptions": {
+      "QoSLevelSubscribe": 0,
+      "QoSLevelPublish": 0,
+      "Retain": true
+    }
+  }
+}

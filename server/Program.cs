@@ -19,6 +19,7 @@ namespace HomieManagement
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration(config => config.AddJsonFile("Server/Config/Config.json", optional: false, reloadOnChange: false))
                 .UseStartup<Startup>();
     }
 }
